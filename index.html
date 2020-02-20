@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8"> 
+    <link rel="stylesheet" type="text/css" href="css/login.css" />
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <link rel="stylesheet" type="text/css" href="css/loader.css" />
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <script src="js/lib/babylon.1.13-beta-debug.js"></script>
+    <script src="js/lib/howler.min.js"></script>
+    <script src="js/lib/Oimo.js"></script>
+
+    <script src="js/game/GUI.js"></script>
+    <script src="js/tutorial/Tutorial.js"></script>
+
+    <script src="js/game/Timer.js"></script>
+    <script src="js/game/Piece.js"></script>
+    <script src="js/game/Base.js"></script>
+    <script src="js/game/Gameboard.js"></script>
+    <script src="js/game/Quarto.js"></script>
+    <script src="js/game/Player.js"></script>
+    <script src="js/game/Index.js"></script>
+    <script src="js/game/AI.js"></script>
+    <script src="js/game/VirtualGame.js"></script>
+
+    <link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,300,100,700|Roboto:400,100,300,500,700,900&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+
+</head>
+<body>
+
+<div id="indexWrapper" class="wrapper">
+    <div id="index" class="content">
+        <button onclick="humanModel();">双人模式</button>
+        <button onclick="robotModel();">人机模式</button>
+    </div>  
+</div>
+
+<div id="loginWrapper" class="wrapper">
+    <div id="login" class="content">
+        <h1>QUARTO</h1>
+
+        <div id="form">
+            <input id="player1" type="text" placeholder="在此输入玩家1的姓名" />
+            <input id="player2" type="text" placeholder="在此输入玩家2的姓名" />
+            <input type="submit" value="PLAY !" onclick="forward();" />
+        </div>
+    </div>
+
+    <!--Loader animation-->
+    <div id="loader" class="spinner" style="visibility: hidden">
+        <div class="rect1"></div>
+        <div class="rect2"></div>
+        <div class="rect3"></div>
+        <div class="rect4"></div>
+        <div class="rect5"></div>
+    </div>
+
+</div>
+
+<div id="levelChooseWrapper" class="wrapper">
+    <div id="levelChoose" class="content">
+        <button onclick="setDifficulty(0);">菜鸡</button>
+        <button onclick="setDifficulty(1);">普通</button>
+        <button onclick="setDifficulty(2);">大佬</button>
+    </div>
+</div>
+
+<div id="game">
+	<canvas id="renderCanvas"></canvas>
+
+    <!--The title-->
+	<div id="title">
+        <div id="titleText">
+            QUARTO
+        </div>
+    </div>
+
+    <!--The gui on the left (player 1) -->
+    <div class="gui" id="gui1">
+        <div class="guiName">
+            <span class="playerName" id="p1name">Player1</span>
+        </div>
+        <div class="actions" id="actionLeft">
+            <img id="p1Put" class="action" src="img/put_icon.png" />
+            <img id="p1Pick" class="action" src="img/pick_icon.png" />
+        </div>
+
+    </div>
+
+    <div class="gui" id="gui2">
+        <div class="guiName">
+            <span  class="playerName" id="p2name">Player2</span>
+        </div>
+        <div class="actions" id="actionRight">
+            <img id="p2Put" class="action" src="img/put_icon.png" />
+            <img id="p2Pick" class="action" src="img/pick_icon.png" />
+        </div>
+    </div>
+
+</div>
+
+<!--Popup displayed at the first game to learn the rules-->
+<div id="startingTutorial">
+    <h1>QUARTO</h1>
+    <p>
+        是否需要观看教程？
+    </p>
+    <table style="width:80%; margin:50px auto;">
+        <tr>
+            <td class="tutoButton" id="startingTutorialNo">是</td>
+            <td class="tutoButton" id="startingTutorialYes">否</td>
+        </tr>
+    </table>
+</div>
+
+
+<div id="win">
+    <h1>QUARTO</h1>
+    <span class="winnerName" id="winnerName">
+        Player1
+    </span>
+    <br>
+    <span id="winText">
+        胜利！！！
+    </span>
+
+    <div id="replayButton" onclick="initGame()">
+        开始新游戏 ?
+    </div>
+</div>
+
+<!--The tutorial ball-->
+<div id="tutorial">
+    <h3>游戏规则</h3>
+</div>
+
+<!--The tutorial panel step 1-->
+<div class="tutorial" id="step1">
+    <p>
+        在Quarto游戏中，您可以看到16个不同的棋子，它们在以下方面有所区别：
+        <ul>
+            <li>高度（高或矮）</li>
+            <li>颜色（黑或白）</li>
+            <li>柱面形状（圆形或方形）</li>
+            <li>顶部是否有凹陷</li>
+        </ul>
+    </p>
+
+    <table style="width:80%; margin:30px auto;">
+        <tr>
+            <td class="tutoButton deactivate"> < 上一条</td>
+            <td class="tutoButton" id="toStep2">下一条 > </td>
+        </tr>
+    </table>
+</div>
+
+<!--Tutorial step 2-->
+<div class="tutorial tutorialBig" id="step2">
+    <p>
+        玩家通过摆放一个 <span class="quarto">QUARTO</span> 获胜。 <br/><br/>
+        <span class="quarto">QUARTO</span> 是指一行、一列或两条对角线上的四个棋子有某一种以上属性相同。<br/><br/>
+        在左边的例子中，四个棋子的顶部都是凹陷的，所以它们组成了一个 <span class="quarto">QUARTO</span>！
+    </p>
+
+    <table style="width:80%; margin:50px auto;">
+        <tr>
+            <td class="tutoButton" id="backStep1"> < 上一条</td>
+            <td class="tutoButton" id="toStep3">下一条 > </td>
+        </tr>
+    </table>
+</div>
+
+<!--Tutorial step 3-->
+<div class="tutorial tutorialBig" id="step3">
+    <p>
+        每回合，先由对手任选一枚在场外的棋子，再由己方放在任一空格。<br>
+        (先手玩家第一轮只需要为对手选择棋子)
+         <br/><br/>
+        如果组成了一个<span class="quarto">QUARTO</span>，当前玩家获胜。否则玩家需要为他的对手选择一个棋子，然后结束该回合。<br/><br/>
+        最先组成 <span class="quarto">QUARTO</span> 的玩家将赢得比赛!
+    </p>
+
+    <table style="width:80%; margin:40px auto;">
+        <tr>
+            <td class="tutoButton" id="backStep2"> < 上一条</td>
+            <td class="tutoButton" id="finish">完成 </td>
+        </tr>
+    </table>
+</div>
+
+
+</body>
+</html>
